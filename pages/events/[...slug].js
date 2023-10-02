@@ -12,9 +12,25 @@ function FilteredEventsPage({ hasError, events, dateF }) {
 
   const filteredData = router.query.slug;
 
+  const filteredYear = filteredData[0];
+  const filteredMonth = filteredData[1];
+
+  const numYear = +filteredYear;
+  const numMonth = +filteredMonth;
+
+  const pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta name="description" content={`All events for ${numMonth}/${numYear}.`} />
+    </Head>
+  )
+
   if (!filteredData) {
     return (
-      <p className="center">Loading...</p>
+      <Fragment>
+        {pageHeadData}
+        <p className="center">Loading...</p>
+      </Fragment>
     )
   }
 
@@ -23,6 +39,7 @@ function FilteredEventsPage({ hasError, events, dateF }) {
   if (hasError) {
     return (
       <Fragment>
+        {pageHeadData}
         <ErrorAlert>
           <p>Invalid filter. Please adjust your values!</p>
         </ErrorAlert>
@@ -35,6 +52,7 @@ function FilteredEventsPage({ hasError, events, dateF }) {
 
   if (!filteredEvents || filteredEvents.length === 0) {
     return <Fragment>
+      {pageHeadData}
       <p>No events found for the chosen filter!</p>
       <div className='center'>
         <Button link="/events">Show All Events</Button>
@@ -46,10 +64,7 @@ function FilteredEventsPage({ hasError, events, dateF }) {
 
   return (
     <Fragment>
-      <Head>
-        <title>Filtered Events</title>
-        <meta name="description" content={`All events for ${numMonth}/${numYear}.`} />
-      </Head>
+      {pageHeadData}
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
     </Fragment>
@@ -60,12 +75,6 @@ export async function getServerSideProps(context) {
   const { params } = context
 
   const filteredData = params.slug;
-
-  const filteredYear = filteredData[0];
-  const filteredMonth = filteredData[1];
-
-  const numYear = +filteredYear;
-  const numMonth = +filteredMonth;
 
   if (isNaN(numYear) || isNaN(numMonth) || numYear > 2030 || numYear < 2021 || numMonth < 1 || numMonth > 12) {
     return {
